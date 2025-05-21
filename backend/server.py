@@ -14,6 +14,12 @@ from xrpl.asyncio.transaction import submit_and_wait
 from xrpl.wallet import Wallet
 from xrpl.constants import CryptoAlgorithm
 
+from pydantic import BaseModel
+
+class SendXrpRequest(BaseModel):
+    amount: float
+    recipient: str
+
 
 FOLDER_PATH = "data"
 FILEPATH_AUDIO = FOLDER_PATH + "/audio.mp3"
@@ -94,7 +100,10 @@ async def interpret():
     return response_json
 
 @app.post("/api/send_xrp")
-async def send_xrp(amount: float, recipient: str):
+async def send_xrp(request: SendXrpRequest):
+    amount = request.amount
+    recipient = request.recipient
+    
     client = JsonRpcClient(JSON_RPC_URL)
     wallet_src = Wallet.from_seed(seed="sEdVUPEuvc6Q16gq4dupSNfYdFZc1gT", algorithm=CryptoAlgorithm.ED25519)
     payment = Payment(
